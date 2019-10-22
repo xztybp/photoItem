@@ -13,13 +13,25 @@
         </template>
       </van-field>
       <van-field placeholder="请输入密码" v-model.trim="msg.code" :error-message="errmsg.code">
-        <van-button slot="button" size="small" type="info">发送验证码</van-button>
+        <van-button
+          slot="button"
+          size="small"
+          type="info"
+          @click="sendCode"
+        >{{flag?'发送验证码':'10s后重新发送'}}</van-button>
         <template slot="left-icon">
           <i class="iconfont icon-icon--"></i>
         </template>
       </van-field>
     </van-cell-group>
-    <van-button type="primary" size="large" @click="login">登录</van-button>
+    <van-button
+      type="primary"
+      size="large"
+      @click="login"
+      :loading="loading"
+      loading-text="登录中..."
+      :disabled="loading"
+    >登录</van-button>
     <div class="msg">
       <span class="bottom">隐私条款</span>
     </div>
@@ -27,6 +39,7 @@
 </template>
 <script>
 import { userLogin } from '@/api/user.js'
+import { setUserLocal } from '@/utils/userInfo.js'
 export default {
   data () {
     return {
@@ -37,21 +50,48 @@ export default {
       errmsg: {
         mobile: '',
         code: ''
-      }
+      },
+      loading: false
     }
   },
   methods: {
-    login () {
+    // 目的 可以让异步代码以同步的方式进行书写
+    // async    用来修饰异步所在的函数
+    async login () {
       if (!this.validData()) {
         return
       }
-      userLogin(this.$http, {
-        url: 'authorizations',
-        method: 'POST',
-        data: this.msg
-      }).then(res => {
-        console.log(res)
-      })
+      // await 用来修改返回 promise 对象的异步请求
+      try {
+        this.loading = true
+        let res = await userLogin(this.$http, {
+          url: 'authorizations',
+          method: 'POST',
+          data: this.msg
+        })
+        // 调用方法将返回的数据存在本地磁盘中
+        setTimeout(() => {
+          this.loading = false
+          this.$router.push('/home')
+        }, 2000)
+        setUserLocal(res.data.data)
+      } catch (err) {
+        console.log(err)
+        this.$toast('用户信息错误,请重新登录')
+        setTimeout(() => {
+          this.loading = false
+        }, 1000)
+      }
+    },
+    // 发送验证码
+    sendCode () {
+      var reg = /^1[3|4|5|7|8][0-9]{9}$/
+      /* console.dir(reg) */
+      if (reg.test(this.msg.mobile) === true) {
+        console.log('验证成功')
+      } else {
+        console.log('验证失败')
+      }
     },
     // 验证数据方法
     validData () {
