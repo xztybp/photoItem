@@ -44,14 +44,15 @@ export default {
   data () {
     return {
       msg: {
-        mobile: '13911111111',
+        mobile: '13922222222',
         code: '246810'
       },
       errmsg: {
         mobile: '',
         code: ''
       },
-      loading: false
+      loading: false,
+      flag: false
     }
   },
   methods: {
@@ -71,10 +72,11 @@ export default {
         })
         // 调用方法将返回的数据存在本地磁盘中
         setTimeout(() => {
+          this.$toast('登录成功')
           this.loading = false
           this.$router.push('/home')
         }, 2000)
-        setUserLocal(res.data.data)
+        setUserLocal(res)
       } catch (err) {
         console.log(err)
         this.$toast('用户信息错误,请重新登录')

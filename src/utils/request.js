@@ -5,6 +5,9 @@ import Store from '@/store/index.js'
 const instance = axios.create({
   baseURL: 'http://ttapi.research.itcast.cn/app/v1_0/'
 })
+const instance1 = axios.create({
+  baseURL: 'http://ttapi.research.itcast.cn/app/v1_1/'
+})
 // Add a request interceptor 添加请求拦截器
 instance.interceptors.request.use(function (config) {
   // Do something before request is sent 发送请求前需要处理的逻辑代码
@@ -19,7 +22,24 @@ instance.interceptors.request.use(function (config) {
 
 // Add a response interceptor 添加响应拦截器
 instance.interceptors.response.use(function (response) {
-  return response
+  return response.data.data
+}, function (error) {
+  return Promise.reject(error)
+})
+instance1.interceptors.request.use(function (config) {
+  // Do something before request is sent 发送请求前需要处理的逻辑代码
+  if (Store.state.userInfo) {
+    config.headers.common['Authorization'] = `Bearer ${Store.state.userInfo.token}`
+  }
+  return config
+}, function (error) {
+  // Do something with request error 处理请求错误
+  return Promise.reject(error)
+})
+
+// Add a response interceptor 添加响应拦截器
+instance1.interceptors.response.use(function (response) {
+  return response.data.data
 }, function (error) {
   return Promise.reject(error)
 })
@@ -33,6 +53,7 @@ let Plugin = {
   // 这里我写的$http加了$符号的，表示它为vue全局的，但实际上不加也可以的，访问时也不加就行了
   install: function (Vue) {
     Vue.prototype.$http = instance
+    Vue.prototype.$http1 = instance1
   }
 }
 export default Plugin
