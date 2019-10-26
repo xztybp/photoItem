@@ -1,6 +1,7 @@
 <template>
   <div class="layout">
-    <van-search v-model="value" shape="round" @search="onSearch" background="#3296fa"></van-search>
+    <!--  <van-search v-model="value" shape="round" @search="onSearch" background="#3296fa"></van-search> -->
+    <van-nav-bar title="首页" />
     <van-tabs v-model="active">
       <van-tab v-for="(item,index) in navList" :title="item.name" :key="index" class="nav-tab">
         <van-pull-refresh v-model="item.pull" @refresh="onRefresh">
@@ -10,28 +11,58 @@
             finished-text="没有更多了"
             @load="onLoad"
           >
-            <van-cell v-for="(articleItem,i) in item.article" :key="i" :title="articleItem.title"></van-cell>
+            <van-cell v-for="(articleItem,i) in item.article" :key="i">
+              <template slot="default">
+                <div class="title">{{articleItem.title}}</div>
+                <div class="img">
+                  <div class="imgList" v-for="(imgList,j) in articleItem.cover.images" :key="j">
+                    <van-image
+                      width="100"
+                      height="100"
+                      :src="imgList"
+                      lazy-load
+                      v-if="imgList.length>0"
+                    />
+                  </div>
+                </div>
+                <div class="btn-memo">
+                  <span>{{articleItem.pubdate | timeFilter}}</span>
+                  <span>评论数:{{articleItem.comm_count}}</span>
+                </div>
+              </template>
+            </van-cell>
           </van-list>
         </van-pull-refresh>
       </van-tab>
     </van-tabs>
-    <van-icon name="wap-nav" />
+    <van-icon name="wap-nav" @click="show=true" />
+    <channel
+      v-model="show"
+      :navList="navList"
+      :active="active"
+      @update:active="(event)=>{active=event}"
+    ></channel>
+    <!--  @update:active="acrive=$event" 也可以 或者:active.sync="active" 利用修饰符也行 都能实现子传父 -->
   </div>
 </template>
 <script>
 import { layoutNavList, articleList } from '@/api/user.js'
+import channel from '@/components/channel.vue'
+import moment from 'moment'
+moment.lang('zh-cn')
 export default {
   data () {
     return {
       value: '',
       active: 0,
       navList: [],
-      timestamp: ''
+      timestamp: '',
+      show: false
     }
   },
   methods: {
     onSearch () {},
-    // 下拉刷新
+    // 上拉刷新
     async onLoad () {
       // 获取文章数据
       let navList = this.navList[this.active]
@@ -47,6 +78,7 @@ export default {
           }
         })
         // 展开运算符
+        console.log(res)
         navList.article = [...navList.article, ...res.results]
         this.timestamp = res.pre_timestamp
         navList.up = false // 将加载状态重置
@@ -58,7 +90,7 @@ export default {
         console.log(error)
       }
     },
-    // 上拉刷新
+    // 下拉刷新
     onRefresh () {
       let navList = this.navList[this.active]
       navList.article = []
@@ -111,14 +143,28 @@ export default {
       console.log(this.navList)
     }
   },
+  filters: {
+    timeFilter (time) {
+      return moment(time, 'YYYY-MM-DD HH:mm:ss').fromNow()
+    }
+  },
   created () {
     this.getNavList()
+  },
+  components: {
+    channel
   }
 }
 </script>
 
 <style lang="less" scoped>
-div.layout /deep/ .van-search {
+.van-nav-bar.van-hairline--bottom {
+  background-color: #0094ff;
+  top: 0;
+  width: 100%;
+  position: fixed;
+}
+/* div.layout /deep/ .van-search {
   height: 80px;
   top: 0;
   position: fixed;
@@ -143,10 +189,10 @@ div.layout /deep/ .van-search {
       }
     }
   }
-}
+} */
 div.layout /deep/ .van-tabs.van-tabs--line {
   margin-bottom: 50px;
-  margin-top: 124px;
+  margin-top: 90px;
   position: relative;
   width: 100%;
   overflow: hidden;
@@ -154,7 +200,7 @@ div.layout /deep/ .van-tabs.van-tabs--line {
     width: 90%;
     position: fixed;
     z-index: 1;
-    top: 80px;
+    top: 46px;
   }
   .van-list {
     .van-cell:nth-child(even) {
@@ -164,16 +210,28 @@ div.layout /deep/ .van-tabs.van-tabs--line {
 }
 i.van-icon.van-icon-wap-nav {
   position: fixed;
-  top: 80px;
+  top: 46px;
   right: 0;
   width: 10%;
-  height: 43px;
-  border-bottom: 1px solid #fff;
+  height: 44px;
   text-align: center;
-  line-height: 43px;
-  border-bottom: 1px solid #fff;
+  line-height: 44px;
+  border-bottom: 0.5px solid #ebedf0;
   font-size: 24px;
   z-index: 1000;
   background-color: #fff; // 此处需给字体设置背景色
+}
+.img {
+  display: flex;
+  justify-content: space-between;
+}
+.title {
+  font-size: 16px;
+  font-weight: 700;
+}
+.btn-memo {
+  span {
+    margin-right: 10px;
+  }
 }
 </style>

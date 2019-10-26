@@ -13,7 +13,7 @@ function layoutNavList (axios, { url, method }) {
     method
   })
 }
-// 加载首页文章列表
+// 加载首页用户文章列表
 function articleList (axios, { url, method, params }) {
   return axios({
     url,
@@ -21,5 +21,20 @@ function articleList (axios, { url, method, params }) {
     params
   })
 }
+// 获取全部文章频道列表
+function allChannel (axios, { url, method }) {
+  return axios({
+    url,
+    method
+  })
+}
+// 批量修改用户频道列表（重置式）
+function bulkEditingChannel (axios, { url, method, data }) {
+  return axios({
+    url,
+    method,
+    data
+  })
+}
 // 暴露给外界：按需导出
-export { userLogin, layoutNavList, articleList }
+export { userLogin, layoutNavList, articleList, allChannel, bulkEditingChannel }

@@ -4,6 +4,8 @@ import Login from '@views/login/login.vue'
 import Home from '@views/Home/home.vue'
 import Layout from '@views/Home/routers/layout.vue'
 import Layout1 from '@views/Home/routers/layout1.vue'
+import Layout2 from '@views/Home/routers/layout2.vue'
+import Layout3 from '@views/Home/routers/layout3.vue'
 Vue.use(VueRouter)
 /* console.log(VueRouter) */
 const routes = [
@@ -15,7 +17,9 @@ const routes = [
     component: Home,
     children: [
       { path: '/', name: 'Layout', component: Layout },
-      { path: 'layout1', name: 'Layout1', component: Layout1 }
+      { path: 'layout1', name: 'Layout1', component: Layout1 },
+      { path: 'layout2', name: 'Layout2', component: Layout2 },
+      { path: 'layout3', name: 'Layout3', component: Layout3 }
     ]
   }
 ]
