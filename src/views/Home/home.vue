@@ -37,6 +37,19 @@ export default {
       active: ''
     }
   }
+  /*   methods: {
+    del () {
+      this.$http({
+        url: `user/blacklists/2`,
+        method: 'DELETE'
+      }).then(res => {
+        console.log(res)
+      })
+    }
+  }, */
+  /*   created () {
+    this.del()
+  } */
 }
 </script>
 

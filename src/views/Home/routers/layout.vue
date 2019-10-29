@@ -26,8 +26,10 @@
                   </div>
                 </div>
                 <div class="btn-memo">
+                  <span :style="{color:'red'}">{{articleItem.is_top | IstopFilter(i)}}</span>
+                  <span>{{articleItem.aut_name}}</span>
+                  <span>{{articleItem.comm_count}}评论</span>
                   <span>{{articleItem.pubdate | timeFilter}}</span>
-                  <span>评论数:{{articleItem.comm_count}}</span>
                 </div>
               </template>
             </van-cell>
@@ -48,8 +50,6 @@
 <script>
 import { layoutNavList, articleList } from '@/api/user.js'
 import channel from '@/components/channel.vue'
-import moment from 'moment'
-moment.lang('zh-cn')
 export default {
   data () {
     return {
@@ -144,12 +144,15 @@ export default {
     }
   },
   filters: {
-    timeFilter (time) {
-      return moment(time, 'YYYY-MM-DD HH:mm:ss').fromNow()
+    IstopFilter (value, i) {
+      if (i <= 4) {
+        return '置顶'
+      }
     }
   },
   created () {
     this.getNavList()
+    console.log(this)
   },
   components: {
     channel
@@ -204,7 +207,7 @@ div.layout /deep/ .van-tabs.van-tabs--line {
   }
   .van-list {
     .van-cell:nth-child(even) {
-      background-color: #dbd3d3;
+      background-color: rgb(238, 238, 245);
     }
   }
 }

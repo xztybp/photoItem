@@ -36,5 +36,23 @@ function bulkEditingChannel (axios, { url, method, data }) {
     data
   })
 }
+// 获取联想列表
+function getThinkList (axios, { url, method }) {
+  return axios({
+    url,
+    method
+  })
+}
+// 获取文章搜索结果
+function getArticleSearchList (axios, page, q) {
+  return axios({
+    url: 'search',
+    method: 'GET',
+    params: {
+      page: page,
+      q: q
+    }
+  })
+}
 // 暴露给外界：按需导出
-export { userLogin, layoutNavList, articleList, allChannel, bulkEditingChannel }
+export { userLogin, layoutNavList, articleList, allChannel, bulkEditingChannel, getThinkList, getArticleSearchList }

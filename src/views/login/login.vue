@@ -44,7 +44,7 @@ export default {
   data () {
     return {
       msg: {
-        mobile: '13922222222',
+        mobile: '13677777777',
         code: '246810'
       },
       errmsg: {
