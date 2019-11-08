@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <router-view></router-view>
-    <van-tabbar route>
+    <van-tabbar route v-show="flag">
       <van-tabbar-item to="/home">
         首页
         <template slot="icon">
@@ -34,22 +34,33 @@
 export default {
   data () {
     return {
-      active: ''
+      active: '',
+      /* 获取设备实际高度 */
+      documentHeight: document.documentElement.clientHeight,
+      dynamicHeight: document.documentElement.clientHeight,
+      flag: true
+    }
+  },
+  mounted () {
+    /* 当视口区尺寸发生变化时执行 */
+    window.onresize = () => {
+      return (() => {
+        this.dynamicHeight = window.document.body.clientHeight
+      })()
+    }
+  },
+  /* 监听动态高度 */
+  watch: {
+    dynamicHeight () {
+      console.log(this.documentHeight)
+      console.log(this.dynamicHeight)
+      if (this.documentHeight > this.dynamicHeight) {
+        this.flag = false
+      } else {
+        this.flag = true
+      }
     }
   }
-  /*   methods: {
-    del () {
-      this.$http({
-        url: `user/blacklists/2`,
-        method: 'DELETE'
-      }).then(res => {
-        console.log(res)
-      })
-    }
-  }, */
-  /*   created () {
-    this.del()
-  } */
 }
 </script>
 

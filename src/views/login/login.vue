@@ -39,7 +39,6 @@
 </template>
 <script>
 import { userLogin } from '@/api/user.js'
-import { setUserLocal } from '@/utils/userInfo.js'
 export default {
   data () {
     return {
@@ -70,13 +69,22 @@ export default {
           method: 'POST',
           data: this.msg
         })
+        this.$store.commit('setUser', res)
         // 调用方法将返回的数据存在本地磁盘中
         setTimeout(() => {
           this.$toast('登录成功')
           this.loading = false
-          this.$router.push('/home')
+          console.log(this.$route)
+          if (this.$route.path === '/login/login') {
+            console.log(this.$route)
+            this.$router.push({
+              path: '/search',
+              query: { value: this.$route.query.value }
+            })
+          } else {
+            this.$router.push('/home')
+          }
         }, 2000)
-        setUserLocal(res)
       } catch (err) {
         console.log(err)
         this.$toast('用户信息错误,请重新登录')
@@ -117,6 +125,9 @@ export default {
       this.errmsg.code = ''
       return true
     }
+  },
+  created () {
+    console.log(this.$route)
   }
 }
 </script>

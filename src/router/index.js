@@ -11,6 +11,7 @@ Vue.use(VueRouter)
 const routes = [
   { path: '/', redirect: '/login' },
   { path: '/login', name: 'Login', component: Login },
+  { path: '/login/login', name: 'Login', component: Login },
   {
     path: '/home',
     name: 'Home',
@@ -22,7 +23,8 @@ const routes = [
       { path: 'layout3', name: 'Layout3', component: Layout3 }
     ]
   },
-  { path: '/search', name: 'search', component: () => import('@views/search/search.vue') }
+  { path: '/search', name: 'search', component: () => import('@views/search/search.vue') },
+  { path: '/articleDetails', name: 'articleDetails', component: () => import('@views/articleDetails/articleDetails.vue') }
 ]
 
 const router = new VueRouter({

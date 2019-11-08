@@ -6,7 +6,7 @@ dayjs.locale('zh-cn')
 const timeFilter = function (value) {
   return dayjs().to(dayjs(value))
 }
-const yearTimeFilter = function (value) {
+const yearTimeFilter = function (value = '') {
   return value.split('T')[0]
 }
 export default {

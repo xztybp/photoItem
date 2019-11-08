@@ -85,7 +85,8 @@ export default {
       /* 保存在本地磁盘中 */
       localStorage.setItem('history', JSON.stringify(this.historyList))
       /* 跳转到搜索页面 */
-      this.$router.push({ name: 'search', params: { value: value } })
+      this.$store.commit('setSearch', value)
+      this.$router.push({ name: 'search', path: '/search' })
     },
     // 点击后清空列表与输入框的值
     onCancel (value) {

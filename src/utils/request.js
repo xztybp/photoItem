@@ -1,9 +1,14 @@
 import axios from 'axios'
 // 导入store 拿到Vuex里面的数据
 import Store from '@/store/index.js'
+import JSONbigint from 'json-bigint'
 // 自定义配置创建axios的新实例
 const instance = axios.create({
   baseURL: 'http://ttapi.research.itcast.cn/app/v1_0/'
+})
+// 创建一个发送失效后token的实例
+const refreshTtokenInstance = axios.create({
+  baseURL: 'http://ttapi.research.itcast.cn/app/'
 })
 const instance1 = axios.create({
   baseURL: 'http://ttapi.research.itcast.cn/app/v1_1/'
@@ -12,7 +17,7 @@ const instance1 = axios.create({
 instance.interceptors.request.use(function (config) {
   // Do something before request is sent 发送请求前需要处理的逻辑代码
   if (Store.state.userInfo) {
-    config.headers.common['Authorization'] = `Bearer ${Store.state.userInfo.token}`
+    config.headers.Authorization = `Bearer ${Store.state.userInfo.token}`
   }
   return config
 }, function (error) {
@@ -23,7 +28,24 @@ instance.interceptors.request.use(function (config) {
 // Add a response interceptor 添加响应拦截器
 instance.interceptors.response.use(function (response) {
   return response.data.data
-}, function (error) {
+}, async function (error) {
+  console.dir(error)
+  if (error.response.status === 401) {
+    console.log('token失效了')
+    let userInfo = Store.state.userInfo
+    let res = await refreshTtokenInstance({
+      url: 'v1_0/authorizations',
+      method: 'put',
+      headers: {
+        Authorization: `Bearer ${userInfo.refresh_token}`
+      }
+    })
+    userInfo.token = res.data.data.token // 得到新的token
+    Store.commit('setUser', userInfo) // 重新修改Store 里面的值
+    console.log('aaaaa')
+    // 刷新token
+    return instance(error.config)
+  }
   return Promise.reject(error)
 })
 instance1.interceptors.request.use(function (config) {
@@ -36,11 +58,20 @@ instance1.interceptors.request.use(function (config) {
   // Do something with request error 处理请求错误
   return Promise.reject(error)
 })
-
+// 改变响应数据:由于在js中数值类型可识别位数有限制,所以需要JSONbigint 插件进行转换
+instance.defaults.transformResponse = [(data) => {
+  try {
+    return JSONbigint.parse(data)
+  } catch (err) {
+    console.log(err)
+    return data
+  }
+}]
 // Add a response interceptor 添加响应拦截器
 instance1.interceptors.response.use(function (response) {
   return response.data.data
 }, function (error) {
+  console.log(error)
   return Promise.reject(error)
 })
 

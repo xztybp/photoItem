@@ -3,19 +3,28 @@
     <!-- 搜索 -->
     <van-search
       :value="value"
-      @input="thinkSearch"
-      placeholder="请输入搜索关键词"
+      @input="Onsearch"
       show-action
       shape="round"
-      @search="onSearch"
-      @clear="onCancel "
       class="header"
+      @clear="onclear"
+      @search="searchWord"
       background="#0094ff"
     >
-      <div slot="action" @click="onSearch(value)" class="reset">搜索</div>
+      <div slot="action" class="reset" @click="searchWord">搜索</div>
     </van-search>
-    <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
-      <van-cell v-for="(item,index) in ArticleSearchList" :key="index">
+    <van-list
+      v-model="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      @load="onLoad"
+      class="searchList"
+    >
+      <van-cell
+        v-for="(item,index) in ArticleSearchList"
+        :key="index"
+        @click="articleDetails(item.art_id)"
+      >
         <template slot="default">
           <div class="authorMsg">
             <van-image width="40" height="40" round src="https://img.yzcdn.cn/vant/cat.jpeg" />
@@ -37,9 +46,24 @@
             </van-image>
           </div>
           <div class="icon">
-            <van-cell :title="item.comm_count" icon="chat-o" :border="false" />
-            <van-cell :title="item.collect_count" icon="good-job-o" :border="false" />
-            <van-cell :title="item.like_count" icon="star-o" :border="false" />
+            <van-cell
+              :title="item.comm_count"
+              icon="chat-o"
+              @click.stop="comment(item.art_id)"
+              :border="false"
+            />
+            <van-cell
+              :title="item.collect_count"
+              icon="good-job-o"
+              @click.stop="easeLike(item.art_id)"
+              :border="false"
+            />
+            <van-cell
+              :title="item.like_count"
+              icon="star-o"
+              @click.stop="isStart(item.art_id)"
+              :border="false"
+            />
           </div>
         </template>
       </van-cell>
@@ -53,17 +77,31 @@ export default {
   data () {
     return {
       page: 0,
-      value: this.$route.params.value,
+      value: '',
       loading: false,
       finished: false,
       ArticleSearchList: [],
-      totalcount: ''
+      totalcount: '',
+      i: ''
     }
   },
   methods: {
-    thinkSearch () {},
-    onSearch () {},
-    onCancel () {},
+    /* 点击清除按钮直接跳转到搜索页面 */
+    onclear () {
+      this.$router.push({ name: 'Layout1' })
+    },
+    /* 监听输入框的值是否为空 */
+    Onsearch (value) {
+      this.value = value
+      if (!this.value) {
+        this.$router.push('/home/layout1')
+      }
+    },
+    async searchWord () {
+      this.page = 1
+      let res = await getArticleSearchList(this.$http, this.page, this.value)
+      this.ArticleSearchList = res.results
+    },
     /* 滚动时发送请求 */
     async onLoad () {
       if (!this.value) {
@@ -72,7 +110,7 @@ export default {
       this.page++
       try {
         let res = await getArticleSearchList(this.$http, this.page, this.value)
-        console.log(res)
+        /* console.log(res) */
         /* 保存数据源 */
         this.ArticleSearchList = [...this.ArticleSearchList, ...res.results]
         /* 数据的总条数 */
@@ -84,13 +122,50 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+    /* 评论操作 */
+    comment (id) {
+      let user = this.$login()
+      if (user) {
+        this.$router.push({
+          path: '/articleDetails',
+          name: 'articleDetails',
+          params: { art_id: id, value: this.value }
+        })
+      }
+    },
+    /* 点赞操作 */
+    async easeLike () {
+      this.$login()
+    },
+    /* 收藏操作 */
+    isStart () {
+      this.$login()
+    },
+    // 点击文章跳转
+    articleDetails (id) {
+      this.$router.push({
+        path: '/articleDetails',
+        name: 'articleDetails',
+        params: { art_id: id, value: this.value }
+      })
     }
+  },
+  created () {
+    this.value = this.$store.state.search
   }
 }
 </script>
 
 <style lang="less" scoped>
 div.search {
+  margin-top: 54px;
+  .header {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1;
+  }
   div.authorMsg {
     display: flex;
     align-items: center;
@@ -115,6 +190,9 @@ div.search {
     i.van-icon {
       font-size: 20px;
     }
+  }
+  .like {
+    color: red;
   }
 }
 </style>

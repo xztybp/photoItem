@@ -54,5 +54,92 @@ function getArticleSearchList (axios, page, q) {
     }
   })
 }
+// 对文章点赞
+function apieaseLike (axios, id) {
+  return axios({
+    url: 'article/likings',
+    method: 'post',
+    data: {
+      target: id
+    }
+  })
+}
+// 对文章取消点赞
+function deleteApieaseLike (axios, id) {
+  return axios({
+    url: `article/likings/${id}`,
+    method: 'DELETE'
+  })
+}
+// 收藏文章
+function collectionsApi (axios, id) {
+  return axios({
+    url: 'article/collections',
+    method: 'post',
+    data: {
+      target: id
+    }
+  })
+}
+// 取消收藏文章
+function deleteCollectionsApi (axios, id) {
+  return axios({
+    url: `article/collections/${id}`,
+    method: 'DELETE'
+  })
+}
+// 获取文章详情
+function getarticleDetailsList (axios, id) {
+  return axios({
+    url: `articles/${id}`,
+    method: 'get'
+  })
+}
+// 获取评论信息
+function getCommentsList (axios, type, source, offset = undefined) {
+  return axios({
+    url: `comments`,
+    method: 'get',
+    params: {
+      type: type,
+      source: source,
+      offset: offset
+    }
+  })
+}
+// 发表评论方法
+function addComments (axios, { target, content, artid = undefined }) {
+  return axios({
+    url: `comments`,
+    method: 'post',
+    data: {
+      target,
+      content,
+      art_id: artid
+    }
+  })
+}
+// 关注用户
+function Followed (axios, target) {
+  return axios({
+    url: `user/followings`,
+    method: 'post',
+    data: {
+      target: target
+    }
+  })
+}
+// 取消关注用户
+function deleteFollowed (axios, target) {
+  return axios({
+    url: `user/followings/${target}`,
+    method: 'DELETE'
+  })
+}
 // 暴露给外界：按需导出
-export { userLogin, layoutNavList, articleList, allChannel, bulkEditingChannel, getThinkList, getArticleSearchList }
+export {
+  userLogin, layoutNavList, articleList, allChannel,
+  bulkEditingChannel, getThinkList, getArticleSearchList,
+  getarticleDetailsList, getCommentsList, addComments,
+  Followed, deleteFollowed, deleteApieaseLike, apieaseLike, collectionsApi, deleteCollectionsApi
+}
